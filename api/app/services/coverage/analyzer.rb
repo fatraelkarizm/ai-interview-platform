@@ -23,8 +23,12 @@ module Coverage
 
       return { skill_updates: [], discovered_skills: [] } if turns.empty?
 
-      prompt   = build_prompt(turns, coverage_maps, skills)
-      response = @gemini_client.generate_content(prompt, temperature: 0.2)
+      prompt = build_prompt(turns, coverage_maps, skills)
+
+      # Same reasoning as Portfolios::Generator: classifying whether an exchange
+      # produced signal is a reading task, not a creative one, and its output
+      # feeds the confidence a rating claims.
+      response = @gemini_client.generate_content(prompt, temperature: 0)
 
       parse_response(response, coverage_maps)
     end
