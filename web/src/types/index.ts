@@ -8,9 +8,14 @@ export interface Assessment {
   created_at?: string;
   updated_at?: string;
   skills?: AssessmentSkill[];
+  session_count?: number;
   latest_session?: {
-    status: "pending" | "active" | "ended";
+    id?: number;
+    status: "pending" | "active" | "ended" | "failed";
     end_reason?: string | null;
+    started_at?: string | null;
+    ended_at?: string | null;
+    portfolio_status?: "pending" | "generating" | "complete" | "failed" | null;
   };
 }
 

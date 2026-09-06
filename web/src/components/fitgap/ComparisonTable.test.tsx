@@ -46,13 +46,47 @@ describe("<ComparisonTable />", () => {
   it("marks a row an assessor corrected", () => {
     render(<ComparisonTable comparisons={[comparison({ is_override: true })]} />);
 
-    expect(within(rowFor("Communication")).getByText("✏")).toBeInTheDocument();
+    expect(within(rowFor("Communication")).getByLabelText(/set by an assessor/i)).toBeInTheDocument();
   });
 
   it("leaves a machine reading unmarked", () => {
     render(<ComparisonTable comparisons={[comparison({ is_override: false })]} />);
 
-    expect(within(rowFor("Communication")).queryByText("✏")).not.toBeInTheDocument();
+    expect(within(rowFor("Communication")).queryByLabelText(/set by an assessor/i)).not.toBeInTheDocument();
+  });
+
+  // Emoji were carrying the meaning: a screen reader announced "white heavy
+  // check mark" instead of "match", and the glyphs render inconsistently across
+  // the fonts installed on Windows.
+  describe("accessibility of the result column", () => {
+    it("announces the result in words", () => {
+      render(<ComparisonTable comparisons={[comparison({ result: "gap", candidate_level: 2, delta: -1 })]} />);
+
+      expect(within(rowFor("Communication")).getByText("Gap −1", { selector: ".sr-only" })).toBeInTheDocument();
+    });
+
+    it("spells out what not assessed means rather than leaving a dash", () => {
+      render(<ComparisonTable comparisons={[comparison({ result: "not_assessed", candidate_level: null, delta: null })]} />);
+
+      expect(
+        within(rowFor("Communication")).getByText(/not covered in the interview/i)
+      ).toBeInTheDocument();
+    });
+
+    it("uses no emoji at all", () => {
+      const { container } = render(
+        <ComparisonTable
+          comparisons={[
+            comparison({ skill_label: "A", result: "match" }),
+            comparison({ skill_label: "B", result: "gap", candidate_level: 2, delta: -1 }),
+            comparison({ skill_label: "C", result: "exceed", candidate_level: 4, delta: 1 }),
+            comparison({ skill_label: "D", result: "not_assessed", candidate_level: null }),
+          ]}
+        />
+      );
+
+      expect(container.textContent ?? "").not.toMatch(/[✅⚠⭐✏️]/);
+    });
   });
 
   describe("the summary line", () => {
