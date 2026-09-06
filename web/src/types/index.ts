@@ -127,12 +127,19 @@ export interface VacancySkill {
 
 export type SkillComparisonResult = "match" | "gap" | "exceed" | "not_assessed";
 
+// Mirrors the payload FitGap::Engine actually stores in
+// fit_gap_reports.skill_comparisons. It previously declared `required_level`,
+// which the API has never sent — so the "Required" column rendered
+// LEVEL_LABELS[undefined] and sat permanently blank while TypeScript stayed
+// quiet, because the type described the component rather than the API.
 export interface SkillComparison {
   skill_label: string;
-  required_level: number;
-  candidate_level?: number;
+  skill_id?: string | null;
+  expected_level: number;
+  candidate_level?: number | null;
   result: SkillComparisonResult;
-  delta?: number;
+  delta?: number | null;
+  confidence?: "high" | "medium" | "low" | null;
   is_override?: boolean;
 }
 
