@@ -19,9 +19,12 @@ export interface Assessment {
   };
 }
 
+// skill_id holds a B7 taxonomy code such as "SK-ENG-001", not a number. It was
+// declared numeric here, in CoverageSkill and in VacancySkill alike, which is
+// why the picker quietly dropped it rather than failing to compile.
 export interface AssessmentSkill {
   id?: number;
-  skill_id?: number;
+  skill_id?: string | null;
   skill_label: string;
   is_custom: boolean;
   expected_level: number;
@@ -54,7 +57,7 @@ export interface Session {
 
 export interface CoverageSkill {
   id: number;
-  skill_id: number;
+  skill_id?: string | null;
   skill_label: string;
   is_discovered: boolean;
   state: "not_yet" | "initiated" | "partial" | "covered";
@@ -129,7 +132,7 @@ export interface Vacancy {
 
 export interface VacancySkill {
   id?: number;
-  skill_id?: number;
+  skill_id?: string | null;
   skill_label: string;
   expected_level: number;
   _destroy?: boolean;
