@@ -91,6 +91,38 @@ RSpec.describe Portfolios::Generator do
     end
   end
 
+  # AC-5, and the brief's "duplicate jobs" failure path. save_skills begins with
+  # portfolio_skills.destroy_all, and PortfolioSkill has_one :assessor_override,
+  # dependent: :destroy — so a second run racing the first does not merely waste
+  # a Gemini call, it can delete an assessor's correction and their notes. Two
+  # concurrent runs were observed doing exactly that, replacing portfolio_skill
+  # ids 1-5 with 6-10 while both reported success.
+  describe 'when a generation is already running' do
+    before do
+      allow(client).to receive(:generate_content).and_return(model_response)
+      session.create_portfolio!(candidate_id: session.candidate_id, generation_status: 'generating')
+    end
+
+    it 'declines to start a second one' do
+      expect(client).not_to receive(:generate_content)
+
+      generator.call
+    end
+
+    it 'leaves the in-flight portfolio untouched' do
+      expect(generator.call.generation_status).to eq('generating')
+    end
+
+    it 'does not destroy an assessor override belonging to the running generation' do
+      skill = create(:portfolio_skill, portfolio: session.portfolio)
+      create(:assessor_override, portfolio_skill: skill)
+
+      generator.call
+
+      expect(AssessorOverride.count).to eq(1)
+    end
+  end
+
   describe 'when the model call fails' do
     before { allow(client).to receive(:generate_content).and_raise(Gemini::HttpClient::ApiError, 'API returned 503') }
 

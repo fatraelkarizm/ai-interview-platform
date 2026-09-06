@@ -20,7 +20,28 @@ module Portfolios
         generation_status: 'pending'
       )
 
-      portfolio.update!(generation_status: 'generating')
+      # Claim the portfolio before doing any work, and refuse to start if
+      # someone else already holds it.
+      #
+      # save_skills begins with portfolio_skills.destroy_all, and PortfolioSkill
+      # has_one :assessor_override, dependent: :destroy — so a second run racing
+      # the first does not merely waste a Gemini call, it can delete an
+      # assessor's correction and their notes. That correction is the product's
+      # human-in-the-loop mechanism, and under UU PDP Art. 10 it is what makes a
+      # rating contestable rather than purely automated.
+      #
+      # Two concurrent runs were observed doing exactly this: portfolio_skill
+      # ids 1-5 replaced by 6-10 while both calls reported success.
+      claimed = Portfolio.where(id: portfolio.id)
+                         .where.not(generation_status: 'generating')
+                         .update_all(generation_status: 'generating')
+
+      if claimed.zero?
+        Rails.logger.info("[N10] Portfolio #{portfolio.id} is already being generated — skipping duplicate job")
+        return portfolio.reload
+      end
+
+      portfolio.reload
 
       prompt = build_prompt
 
