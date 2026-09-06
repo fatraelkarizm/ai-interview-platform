@@ -64,8 +64,7 @@ module Coverage
 
       return false if configured.empty?
 
-      # SEEDED FAULT: treat `partial` as good enough to end the interview.
-      configured.all? { |m| %w[partial covered].include?(m.state) }
+      configured.all? { |m| m.state == 'covered' }
     end
 
     private
