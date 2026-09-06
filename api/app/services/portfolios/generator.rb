@@ -22,8 +22,16 @@ module Portfolios
 
       portfolio.update!(generation_status: 'generating')
 
-      prompt   = build_prompt
-      response = @gemini_client.generate_content(prompt, temperature: 0.2)
+      prompt = build_prompt
+
+      # temperature 0, not 0.2. This call reads fixed evidence — a finished
+      # transcript and a finished coverage map — and reports what is in it. It
+      # is not a creative task, and sampling made it disagree with itself: two
+      # consecutive runs over identical input returned Communication L3 and then
+      # L2. One level is the entire distance between `Match` and `Gap -1` in
+      # FitGap::Engine, so that variance decides hiring outcomes. Comparability
+      # between candidates is the premise of the whole product.
+      response = @gemini_client.generate_content(prompt, temperature: 0)
 
       save_skills(portfolio, response)
       portfolio.update!(generation_status: 'complete', generated_at: Time.current)
