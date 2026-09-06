@@ -85,13 +85,18 @@ export interface Portfolio {
   overrides: AssessorOverride[];
 }
 
+// Mirrors what PortfoliosController actually serialises. `ai_level` was
+// declared as a string annotated "L1" | "L2" | ... — the column is an integer,
+// the API sends an integer, and parseLevel() exists in this codebase to paper
+// over the mismatch at every call site rather than fixing it here.
+// `skill_id` is a taxonomy code such as "SK-ENG-001", not a number.
 export interface PortfolioSkill {
   id: number;
-  skill_id?: number;
+  skill_id?: string | null;
   skill_label: string;
   is_discovered: boolean;
-  ai_level: string;       // "L1" | "L2" | "L3" | "L4" | "L5"
-  ai_confidence: string;  // "high" | "medium" | "low"
+  ai_level: number;
+  ai_confidence: "high" | "medium" | "low" | null;
   evidence: string[];
   competency_summary: string;
 }

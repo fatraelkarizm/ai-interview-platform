@@ -36,6 +36,7 @@ export default function SkillPortfolioCard({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
             <LevelBadge
+              data-testid="card-level"
               level={effectiveLevel}
               className={cn(
                 "shrink-0",

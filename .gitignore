@@ -20,3 +20,6 @@ web/.vite/
 
 # Local dev env for docker-compose.dev.yml
 api/.env.docker
+
+# Frontend build output
+web/dist/
