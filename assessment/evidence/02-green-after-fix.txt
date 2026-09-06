@@ -1,0 +1,18 @@
+time="2026-09-06T21:49:59+07:00" level=warning msg="No services to build"
+ Container ai-interview-platform-redis-1 Running 
+ Container ai-interview-platform-db-1 Running 
+time="2026-09-06T21:50:00+07:00" level=warning msg="No services to build"
+ Container ai-interview-platform-db-1 Waiting 
+ Container ai-interview-platform-redis-1 Waiting 
+ Container ai-interview-platform-redis-1 Healthy 
+ Container ai-interview-platform-db-1 Healthy 
+ Container ai-interview-platform-api-run-e51e02fe6fe1 Creating 
+ Container ai-interview-platform-api-run-e51e02fe6fe1 Created 
+Randomized with seed 11786
+........................................
+
+Finished in 2.44 seconds (files took 10.44 seconds to load)
+40 examples, 0 failures
+
+Randomized with seed 11786
+

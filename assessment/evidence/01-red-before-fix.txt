@@ -1,0 +1,55 @@
+time="2026-09-06T21:46:36+07:00" level=warning msg="No services to build"
+ Container ai-interview-platform-redis-1 Running 
+ Container ai-interview-platform-db-1 Running 
+time="2026-09-06T21:46:37+07:00" level=warning msg="No services to build"
+ Container ai-interview-platform-redis-1 Waiting 
+ Container ai-interview-platform-db-1 Waiting 
+ Container ai-interview-platform-redis-1 Healthy 
+ Container ai-interview-platform-db-1 Healthy 
+ Container ai-interview-platform-api-run-7e4e8562b5da Creating 
+ Container ai-interview-platform-api-run-7e4e8562b5da Created 
+......FFF........F...............
+Failures:
+  1) Coverage::Analyzer evidence depth after a skill is covered still caps the increment at one per run
+     Failure/Error: expect(analyzer.call[:skill_updates].first[:new_probe_count]).to eq(3)
+     NoMethodError:
+       undefined method `[]' for nil
+     # ./spec/services/coverage/analyzer_spec.rb:83:in `block (3 levels) in <top (required)>'
+     # ./spec/rails_helper.rb:29:in `block (3 levels) in <top (required)>'
+     # ./app/models/current.rb:23:in `using'
+     # ./spec/support/tenant_context.rb:50:in `with_tenant'
+     # ./spec/rails_helper.rb:29:in `block (2 levels) in <top (required)>'
+  2) Coverage::Analyzer evidence depth after a skill is covered keeps counting probes
+     Failure/Error: expect(update).to be_present
+       expected `nil.present?` to be truthy, got false
+     # ./spec/services/coverage/analyzer_spec.rb:66:in `block (3 levels) in <top (required)>'
+     # ./spec/rails_helper.rb:29:in `block (3 levels) in <top (required)>'
+     # ./app/models/current.rb:23:in `using'
+     # ./spec/support/tenant_context.rb:50:in `with_tenant'
+     # ./spec/rails_helper.rb:29:in `block (2 levels) in <top (required)>'
+  3) Coverage::Analyzer evidence depth after a skill is covered still refuses to move the state
+     Failure/Error: expect(update[:new_state]).to eq('covered')
+     NoMethodError:
+       undefined method `[]' for nil
+     # ./spec/services/coverage/analyzer_spec.rb:76:in `block (3 levels) in <top (required)>'
+     # ./spec/rails_helper.rb:29:in `block (3 levels) in <top (required)>'
+     # ./app/models/current.rb:23:in `using'
+     # ./spec/support/tenant_context.rb:50:in `with_tenant'
+     # ./spec/rails_helper.rb:29:in `block (2 levels) in <top (required)>'
+  4) Coverage::MapInjector#all_covered? when the candidate mentions a new skill on their final answer still lets the session finish
+     Failure/Error: expect(injector.all_covered?).to be true
+       expected true
+            got false
+     # ./spec/services/coverage/map_injector_spec.rb:60:in `block (4 levels) in <main>'
+     # ./spec/rails_helper.rb:29:in `block (3 levels) in <top (required)>'
+     # ./app/models/current.rb:23:in `using'
+     # ./spec/support/tenant_context.rb:50:in `with_tenant'
+     # ./spec/rails_helper.rb:29:in `block (2 levels) in <top (required)>'
+Finished in 1.77 seconds (files took 9.5 seconds to load)
+33 examples, 4 failures
+Failed examples:
+rspec ./spec/services/coverage/analyzer_spec.rb:79 # Coverage::Analyzer evidence depth after a skill is covered still caps the increment at one per run
+rspec ./spec/services/coverage/analyzer_spec.rb:60 # Coverage::Analyzer evidence depth after a skill is covered keeps counting probes
+rspec ./spec/services/coverage/analyzer_spec.rb:70 # Coverage::Analyzer evidence depth after a skill is covered still refuses to move the state
+rspec ./spec/services/coverage/map_injector_spec.rb:59 # Coverage::MapInjector#all_covered? when the candidate mentions a new skill on their final answer still lets the session finish
+Randomized with seed 27006

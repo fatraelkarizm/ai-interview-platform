@@ -19,6 +19,7 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
 
   config.include FactoryBot::Syntax::Methods
+  config.include ActiveSupport::Testing::TimeHelpers
 
   # Every AI-interview model is TenantScoped: its default_scope and its
   # before_validation both read Current.tenant_id, which raises when unset.
