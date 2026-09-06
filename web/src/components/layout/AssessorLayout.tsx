@@ -28,11 +28,14 @@ export default function AssessorLayout() {
     <div className="min-h-screen flex flex-col bg-background">
       {/* Top header */}
       <header className="border-b bg-white sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link to="/assessments" className="flex items-center gap-2">
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-3 sm:gap-6">
+            <Link to="/assessments" className="flex shrink-0 items-center gap-2">
               <LayoutDashboard className="h-5 w-5 text-primary" />
-              <span className="font-semibold text-sm">Rakamin AI Interview</span>
+              {/* The wordmark is the first thing worth dropping on a narrow
+                  screen: the icon still identifies the product, and the nav
+                  below it is what the assessor came for. */}
+              <span className="hidden text-sm font-semibold sm:inline">Rakamin AI Interview</span>
             </Link>
             <nav className="flex items-center gap-1">
               {navItems.map(({ href, label, icon: Icon }) => (
@@ -52,15 +55,15 @@ export default function AssessorLayout() {
               ))}
             </nav>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             {tenant.name && (
-              <span className="text-xs text-muted-foreground border rounded-full px-2.5 py-0.5">
+              <span className="hidden max-w-[10rem] truncate rounded-full border px-2.5 py-0.5 text-xs text-muted-foreground md:inline-block">
                 Tenant: {tenant.name}
               </span>
             )}
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut className="h-4 w-4 mr-1.5" />
-              Logout
+            <Button variant="ghost" size="sm" onClick={handleLogout} aria-label="Log out">
+              <LogOut className="h-4 w-4 sm:mr-1.5" />
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
