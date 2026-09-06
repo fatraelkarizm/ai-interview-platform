@@ -17,3 +17,6 @@ web/.vite/
 
 # OS
 .DS_Store
+
+# Local dev env for docker-compose.dev.yml
+api/.env.docker
