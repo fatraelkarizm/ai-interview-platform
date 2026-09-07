@@ -49,6 +49,9 @@ Rails.application.routes.draw do
       get  'skill_taxonomies',          to: 'skill_taxonomies#index'
       get  'skill_taxonomies/:skill_id', to: 'skill_taxonomies#show', as: :skill_taxonomy
 
+      # Every finished candidate across every assessment, in one place.
+      resources :results, only: [:index]
+
       # Vacancies
       resources :vacancies
 
