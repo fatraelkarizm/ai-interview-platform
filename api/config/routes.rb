@@ -54,6 +54,10 @@ Rails.application.routes.draw do
 
       # Portfolios — fit/gap and export
       resources :portfolios, only: [] do
+        # The decision a human made, and what they were looking at when they
+        # made it. Singular: one decision per candidate, enforced in the DB.
+        resource :hiring_decision, only: %i[show create], controller: 'hiring_decisions'
+
         member do
           post :fitgap
           post :regenerate_fitgap

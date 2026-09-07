@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_07_000100) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_07_000200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -103,6 +103,22 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_07_000100) do
     t.index ["portfolio_id", "vacancy_id"], name: "index_fit_gap_reports_on_portfolio_id_and_vacancy_id", unique: true
     t.index ["portfolio_id"], name: "index_fit_gap_reports_on_portfolio_id"
     t.index ["vacancy_id"], name: "index_fit_gap_reports_on_vacancy_id"
+  end
+
+  create_table "hiring_decisions", force: :cascade do |t|
+    t.bigint "portfolio_id", null: false
+    t.string "decision", limit: 20, null: false
+    t.text "rationale", null: false
+    t.jsonb "levels_at_decision", default: {}, null: false
+    t.bigint "decided_by", null: false
+    t.datetime "decided_at", default: -> { "now()" }, null: false
+    t.string "ip_address", limit: 45
+    t.string "user_agent", limit: 255
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["portfolio_id"], name: "index_hiring_decisions_on_portfolio_id", unique: true
+    t.check_constraint "char_length(btrim(rationale)) >= 20", name: "chk_hiring_decisions_rationale"
+    t.check_constraint "decision::text = ANY (ARRAY['advance'::character varying, 'hold'::character varying, 'reject'::character varying]::text[])", name: "chk_hiring_decisions_decision"
   end
 
   create_table "organizations", force: :cascade do |t|
@@ -222,6 +238,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_07_000100) do
   add_foreign_key "coverage_maps", "sessions"
   add_foreign_key "fit_gap_reports", "portfolios"
   add_foreign_key "fit_gap_reports", "vacancies"
+  add_foreign_key "hiring_decisions", "portfolios"
   add_foreign_key "portfolio_skills", "portfolios"
   add_foreign_key "portfolios", "sessions"
   add_foreign_key "sessions", "assessments"
