@@ -10,6 +10,9 @@ class Session < ApplicationRecord
   has_many :transcript_turns, dependent: :destroy
   has_many :coverage_maps, dependent: :destroy
   has_one  :portfolio, dependent: :destroy
+  has_one  :candidate_consent, dependent: :destroy
+
+  def consented? = candidate_consent.present?
 
   validates :invite_token, presence: true, uniqueness: true
   validates :status, inclusion: { in: STATUSES }
