@@ -176,6 +176,18 @@ module Portfolios
       }
     end
 
+    # `nil.to_i` is 0 and `.clamp(1, 5)` lifts it to 1, so a skill the model did
+    # not probe was stored as "L1, Foundational": a rating on a real person
+    # invented by a type coercion, indistinguishable on screen from one the
+    # interview actually earned. An absent level stays absent.
+    def level_from(raw)
+      return nil if raw.nil? || raw.to_s.strip.empty?
+
+      Integer(raw).clamp(1, 5)
+    rescue ArgumentError, TypeError
+      nil
+    end
+
     def save_skills(portfolio, response)
       data = response.is_a?(Hash) ? response : JSON.parse(response)
 
@@ -187,7 +199,7 @@ module Portfolios
           skill_id:           skill_data['skill_id'],
           skill_label:        skill_data['skill_label'],
           is_discovered:      false,
-          ai_level:           skill_data['level'].to_i.clamp(1, 5),
+          ai_level:           level_from(skill_data['level']),
           ai_confidence:      skill_data['confidence'],
           evidence:           Array(skill_data['evidence']).first(3),
           competency_summary: skill_data['competency_summary']
@@ -199,7 +211,7 @@ module Portfolios
           skill_id:           nil,
           skill_label:        skill_data['skill_label'],
           is_discovered:      true,
-          ai_level:           skill_data['level'].to_i.clamp(1, 5),
+          ai_level:           level_from(skill_data['level']),
           ai_confidence:      skill_data['confidence'],
           evidence:           Array(skill_data['evidence']).first(3),
           competency_summary: skill_data['competency_summary']

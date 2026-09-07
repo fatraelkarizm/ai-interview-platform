@@ -103,7 +103,8 @@ export interface PortfolioSkill {
   skill_id?: string | null;
   skill_label: string;
   is_discovered: boolean;
-  ai_level: number;
+  // null means the interview never reached this skill. Not a zero, not an L1.
+  ai_level: number | null;
   ai_confidence: "high" | "medium" | "low" | null;
   evidence: string[];
   competency_summary: string;

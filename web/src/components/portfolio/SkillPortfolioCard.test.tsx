@@ -100,6 +100,36 @@ describe("<SkillPortfolioCard />", () => {
     });
   });
 
+  // The backend used to turn a missing level into L1 through nil.to_i.clamp.
+  // The card must not reintroduce the same fabrication on the way out.
+  describe("when the interview never reached the skill", () => {
+    it("shows no level rather than an invented one", () => {
+      render(<SkillPortfolioCard skill={skill({ ai_level: null as never })} onOverrideSaved={noop} />);
+
+      const badge = screen.getByTestId("card-level");
+      expect(badge).toHaveTextContent(/not assessed/i);
+      expect(badge).not.toHaveTextContent("L1");
+    });
+
+    it("says it is a gap in the interview, not a weakness in the candidate", () => {
+      render(<SkillPortfolioCard skill={skill({ ai_level: null as never })} onOverrideSaved={noop} />);
+
+      expect(screen.getByText(/gap in the interview/i)).toBeInTheDocument();
+    });
+
+    it("still shows the assessor's level once a human has set one", () => {
+      render(
+        <SkillPortfolioCard
+          skill={skill({ ai_level: null as never })}
+          override={override({ override_level: 2 })}
+          onOverrideSaved={noop}
+        />
+      );
+
+      expect(screen.getByTestId("card-level")).toHaveTextContent("L2");
+    });
+  });
+
   it("flags a skill the candidate raised unprompted", () => {
     render(<SkillPortfolioCard skill={skill({ is_discovered: true })} onOverrideSaved={noop} />);
 

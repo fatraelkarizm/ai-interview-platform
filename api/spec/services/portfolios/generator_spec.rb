@@ -73,6 +73,58 @@ RSpec.describe Portfolios::Generator do
     end
   end
 
+  # The most expensive defect this product can carry, because nothing about the
+  # result looks wrong. `nil.to_i` is 0, `.clamp(1, 5)` lifts it to 1, and a
+  # skill the interview never reached was filed as "L1, Foundational" against a
+  # real person, indistinguishable on screen from a level they earned.
+  describe 'a skill the interview never reached' do
+    def response_with_level(level)
+      r = model_response.deep_dup
+      r['configured_skills'][0]['level'] = level
+      r['discovered_skills'] = []
+      r
+    end
+
+    it 'records no level rather than inventing one' do
+      allow(client).to receive(:generate_content).and_return(response_with_level(nil))
+
+      skill = generator.call.portfolio_skills.find_by(skill_id: 'SK-ENG-001')
+
+      expect(skill.ai_level).to be_nil
+      expect(skill).not_to be_assessed
+    end
+
+    it 'does not quietly become L1' do
+      allow(client).to receive(:generate_content).and_return(response_with_level(nil))
+
+      expect(generator.call.portfolio_skills.find_by(skill_id: 'SK-ENG-001').ai_level).not_to eq(1)
+    end
+
+    it 'treats an empty string the same way' do
+      allow(client).to receive(:generate_content).and_return(response_with_level(''))
+
+      expect(generator.call.portfolio_skills.find_by(skill_id: 'SK-ENG-001').ai_level).to be_nil
+    end
+
+    it 'treats unparseable junk the same way rather than guessing' do
+      allow(client).to receive(:generate_content).and_return(response_with_level('not a level'))
+
+      expect(generator.call.portfolio_skills.find_by(skill_id: 'SK-ENG-001').ai_level).to be_nil
+    end
+
+    it 'still reads a level sent as a numeric string' do
+      allow(client).to receive(:generate_content).and_return(response_with_level('4'))
+
+      expect(generator.call.portfolio_skills.find_by(skill_id: 'SK-ENG-001').ai_level).to eq(4)
+    end
+
+    it 'keeps a real level assessed' do
+      allow(client).to receive(:generate_content).and_return(response_with_level(3))
+
+      expect(generator.call.portfolio_skills.find_by(skill_id: 'SK-ENG-001')).to be_assessed
+    end
+  end
+
   describe 'defending against implausible model output' do
     it 'clamps a level outside L1-L5 rather than storing it' do
       response = model_response.deep_dup

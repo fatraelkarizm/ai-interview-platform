@@ -21,7 +21,10 @@ export default function SkillPortfolioCard({
   override,
   onOverrideSaved,
 }: SkillPortfolioCardProps) {
-  const effectiveLevel = override?.override_level ?? parseLevel(skill.ai_level);
+  // A skill the interview never reached has no level. Showing one would be the
+  // same fabrication the backend just stopped doing.
+  const notAssessed = !override && (skill.ai_level === null || skill.ai_level === undefined);
+  const effectiveLevel = override?.override_level ?? (skill.ai_level != null ? parseLevel(skill.ai_level) : null);
   const confidence = normalizeConfidence(skill.ai_confidence);
   const evidence = skill.evidence ?? [];
 
@@ -35,9 +38,18 @@ export default function SkillPortfolioCard({
       <CardContent className="space-y-4 p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-3">
+            {notAssessed ? (
+              <span
+                data-testid="card-level"
+                className="inline-flex shrink-0 flex-col items-center justify-center rounded border border-dashed border-neutral-400 bg-neutral-100 px-3 py-2 text-base font-semibold text-neutral-500"
+              >
+                <span>&ndash;</span>
+                <span className="text-[10px] font-normal opacity-80">Not assessed</span>
+              </span>
+            ) : (
             <LevelBadge
               data-testid="card-level"
-              level={effectiveLevel}
+              level={effectiveLevel as number}
               className={cn(
                 "shrink-0",
                 // A level the system cannot stand behind should not look like
@@ -46,6 +58,7 @@ export default function SkillPortfolioCard({
                 provisional && "border border-dashed border-rose-400 opacity-80"
               )}
             />
+            )}
 
             <div className="min-w-0 space-y-1.5">
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -62,18 +75,25 @@ export default function SkillPortfolioCard({
                 )}
               </div>
 
-              <ConfidenceIndicator
-                confidence={skill.ai_confidence}
-                evidenceCount={evidence.length}
-              />
+              {notAssessed ? (
+                <p className="max-w-prose text-xs leading-relaxed text-neutral-600">
+                  The interview never reached this skill, so there is no rating to give. It is not a
+                  weakness and it is not a low score, it is a gap in the interview.
+                </p>
+              ) : (
+                <ConfidenceIndicator
+                  confidence={skill.ai_confidence}
+                  evidenceCount={evidence.length}
+                />
+              )}
 
-              {!override && (
+              {!override && !notAssessed && (
                 <ConfidenceCaveat confidence={skill.ai_confidence} className="max-w-prose" />
               )}
 
               {override && (
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  AI rated L{parseLevel(skill.ai_level)}; assessor set L{override.override_level}.
+                  AI rated {skill.ai_level == null ? "no level" : `L${parseLevel(skill.ai_level)}`}; assessor set L{override.override_level}.
                 </p>
               )}
             </div>
